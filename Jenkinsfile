@@ -1,6 +1,6 @@
 node ('NamitaNode') {
     // Environment variable
-    env.JIRA_SITE = 'jenkins-jira'  // Make sure this matches the "Jira Site" configured in Jenkins
+    env.JIRA_SITE = 'Namita_jira_sites'  // Make sure this matches the "Jira Site" configured in Jenkins
 
     try {
         stage('checkout code') {

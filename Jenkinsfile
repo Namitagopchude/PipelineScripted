@@ -44,8 +44,7 @@ node ('NamitaNode') {
                 failOnError: false
             )
         }
-    } finally {
-        // Post build action - always runs
-        slackSend channel: '#all-jenkinsnotifier', message: "Deployment Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-    }
+        
+    } 
+
 }

@@ -1,0 +1,51 @@
+node ('NamitaNode') {
+    // Environment variable
+    env.JIRA_SITE = 'jenkins-jira'  // Make sure this matches the "Jira Site" configured in Jenkins
+
+    try {
+        stage('checkout code') {
+            checkout scm
+        }
+
+        stage('build') {
+            bat 'mvn clean install -Denforcer.skip=true'
+        }
+
+        stage('SonarQube Analysis') {
+            withCredentials([string(credentialsId: 'Sonarqube', variable: 'Sonarqube')]) {
+                bat "mvn sonar:sonar -Dsonar.projectKey=Jenkins-maven -Dsonar.projectName=\"Jenkins-maven\" -Dsonar.token=${Sonarqube}"
+            }
+        }
+
+        stage('Archive HTML Reports') {
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/site/jacoco',
+                reportFiles: 'index.html',
+                reportName: 'Code Coverage'
+            ])
+        }
+
+        stage('Archive Artifacts') {
+            archiveArtifacts artifacts: '**/target/*.jar'
+        }
+
+        stage('deploy') {
+            bat 'java -jar "%WORKSPACE%/target/my-app-1.0-SNAPSHOT.jar"'
+        }
+
+        stage('Update Jira') {
+            jiraAddComment(
+                idOrKey: 'JEN-1',
+                comment: '✅ Build completed successfully.',
+                site: env.JIRA_SITE,
+                failOnError: false
+            )
+        }
+    } finally {
+        // Post build action - always runs
+        slackSend channel: '#all-jenkinsnotifier', message: "Build Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+    }
+}

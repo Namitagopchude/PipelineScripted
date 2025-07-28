@@ -15,7 +15,7 @@ node ('NamitaNode') {
 
         stage('SonarQube Analysis') {
             withCredentials([string(credentialsId: 'Namita_Sonar', variable: 'Namita_Sonar')]) {
-                bat "mvn sonar:sonar -Dsonar.projectKey=Jenkins-maven -Dsonar.projectName=\"Jenkins-maven\" -Dsonar.token=${Namita_Sonar}"
+                bat "mvn sonar:sonar -Dsonar.projectKey=Jenkins-maven -Dsonar.projectName=\"Jenkins-maven\" -Dsonar.token=%Namita_Sonar%"
             }
         }
 

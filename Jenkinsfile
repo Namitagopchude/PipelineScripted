@@ -2,6 +2,8 @@ node ('NamitaNode') {
     // Environment variable
     env.JIRA_SITE = 'Namita_jira_sites'  // Make sure this matches the "Jira Site" configured in Jenkins
 
+    def cacheDir = "${env.WORKSPACE}\\.cache"
+
     try {
         stage('checkout code') {
             checkout scm
@@ -46,5 +48,16 @@ node ('NamitaNode') {
         }
         
     } 
+
+    catch (err) {
+        echo "Build failed: ${err}"
+        // Clear cache on failure to avoid using bad cache next time
+        if (fileExists(cacheDir)) {
+            echo "Deleting cache directory due to failure"
+            bat "rmdir /S /Q \"${cacheDir}\""
+        }
+        currentBuild.result = 'FAILURE'
+        throw err
+    }
 
 }

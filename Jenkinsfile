@@ -1,6 +1,7 @@
 node ('NamitaNode') {
     // Environment variable
     env.JIRA_SITE = 'Namita_jira_sites'  // Make sure this matches the "Jira Site" configured in Jenkins
+    env.SLACK_CHANNEL = '#all-jenkinsnotifier'
 
     def cacheDir = "${env.WORKSPACE}\\.cache"
 
@@ -46,6 +47,12 @@ node ('NamitaNode') {
                 failOnError: false
             )
         }
+        echo '✅ Pipeline completed successfully!'
+        slackSend(
+            channel: "${env.SLACK_CHANNEL}",
+            message: "✅ *Build SUCCESSFUL*\n*Job:* ${env.JOB_NAME}\n*Build:* #${env.BUILD_NUMBER}\n🔗 ${env.BUILD_URL}",
+            tokenCredentialId: 'namita-slack'
+        )
         
     } 
 
@@ -57,6 +64,11 @@ node ('NamitaNode') {
             bat "rmdir /S /Q \"${cacheDir}\""
         }
         currentBuild.result = 'FAILURE'
+        slackSend(
+            channel: "${env.SLACK_CHANNEL}",
+            message: "❌ *Build FAILED*\n*Job:* ${env.JOB_NAME}\n*Build:* #${env.BUILD_NUMBER}\n🔗 ${env.BUILD_URL}",
+            tokenCredentialId: 'namita-slack'
+        )
         throw err
     }
 

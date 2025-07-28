@@ -12,8 +12,8 @@ node ('NamitaNode') {
         }
 
         stage('SonarQube Analysis') {
-            withCredentials([string(credentialsId: 'Sonarqube', variable: 'Sonarqube')]) {
-                bat "mvn sonar:sonar -Dsonar.projectKey=Jenkins-maven -Dsonar.projectName=\"Jenkins-maven\" -Dsonar.token=${Sonarqube}"
+            withCredentials([string(credentialsId: 'Namita_Sonar', variable: 'Namita_Sonar')]) {
+                bat "mvn sonar:sonar -Dsonar.projectKey=Jenkins-maven -Dsonar.projectName=\"Jenkins-maven\" -Dsonar.token=${Namita_Sonar}"
             }
         }
 
@@ -46,6 +46,6 @@ node ('NamitaNode') {
         }
     } finally {
         // Post build action - always runs
-        slackSend channel: '#all-jenkinsnotifier', message: "Build Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        slackSend channel: '#all-jenkinsnotifier', message: "Deployment Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
     }
 }
